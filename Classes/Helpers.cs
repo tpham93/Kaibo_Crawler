@@ -1,6 +1,6 @@
 ﻿using SharpDX;
 
-namespace DrawModel
+namespace Kaibo_Crawler
 {
     class Helpers
     {

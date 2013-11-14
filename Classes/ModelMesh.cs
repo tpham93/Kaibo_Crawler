@@ -11,7 +11,7 @@ using SharpDX.D3DCompiler;
 //using Buffer = SharpDX.Direct3D10.Buffer;
 //using Device = SharpDX.Direct3D10.Device;
 
-namespace DrawModel
+namespace Kaibo_Crawler
 {
     class ModelMesh
     {

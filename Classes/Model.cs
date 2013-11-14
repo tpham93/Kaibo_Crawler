@@ -7,7 +7,7 @@ using SharpDX.Toolkit.Graphics;
 using System;
 using System.Collections.Generic;
 
-namespace DrawModel
+namespace Kaibo_Crawler
 {
     class Model
     {
