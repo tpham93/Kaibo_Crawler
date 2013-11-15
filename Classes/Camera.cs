@@ -15,29 +15,23 @@ namespace Kaibo_Crawler
         Matrix view;
 
         public Matrix viewProjection;
+        public Vector3 direction;
 
-        public Vector3 position;
-
-        Vector3 direction;
-
-        float yaw;
+        public float yaw;
         float pitch;
 
         float rotationSpeed;
-        float moveSpeed;
 
         float oldMouseX;
         float oldMouseY;
 
         public Camera(Vector3 position, GraphicsDevice graphics)
         {
-            this.position = position;
 
             this.rotationSpeed = 0.5f;
-            this.moveSpeed = 0.5f;
 
             view = Matrix.LookAtRH(
-                this.position,   // Position
+                position,   // Position
                 new Vector3(0.0f, 20.0f, 0.0f),     // At (point which is centered in the middle of the screen).
                 Vector3.Up);     // Up
 
@@ -50,21 +44,8 @@ namespace Kaibo_Crawler
 
         }
 
-        public void update()
+        public void update(Vector3 position)
         {
-
-            if (Input.isPressed(Keys.W))
-                move(Vector3.UnitZ * -moveSpeed);
-
-            else if (Input.isPressed(Keys.S))
-                move(Vector3.UnitZ * moveSpeed);
-
-            if (Input.isPressed(Keys.A))
-                move(Vector3.UnitX * -moveSpeed);
-
-            else if (Input.isPressed(Keys.D))
-                move(Vector3.UnitX * moveSpeed);
-
 
             pitch = MathUtil .Clamp(pitch, -1.5f, 1.5f);
 
@@ -77,41 +58,28 @@ namespace Kaibo_Crawler
             pitch -= rotationSpeed * dy;
 
             resetMouse();
-            updateMatrices();
+            updateMatrices(position);
         }
 
-        public void updateMatrices() 
+        private void updateMatrices(Vector3 position) 
         {
             Matrix rotation = Matrix.RotationX(pitch) * Matrix.RotationY(yaw);
 
-            direction = Helpers.Transform(new Vector3(0, 0, -1),ref rotation);
+            direction = Helpers.Transform(-Vector3.UnitZ,ref rotation);
 
             Vector3 lookAt = position + direction;
 
-            view = Matrix.LookAtRH(position, lookAt, Vector3.Up);
+            view = Matrix.LookAtRH(position , lookAt, Vector3.Up);
 
             viewProjection = view * projection;
         }
 
-        public void resetMouse()
+        private void resetMouse()
         {
             Input.mouse.SetPosition(new Vector2(0.5f));
 
             oldMouseX = 0.5f;
             oldMouseY = 0.5f;
-        }
-
-        public void move(Vector3 dir)
-        {
-            Matrix rotationY = Matrix.RotationY(yaw);
-            dir = Helpers.Transform(dir,ref rotationY);
-
-            position += dir;
-        }
-
-        public Vector3 getLookDirection()
-        {
-            return direction;
         }
 
     }

@@ -28,8 +28,7 @@ namespace Kaibo_Crawler
         SamplerState m_linearSamplerState;
         BlendState m_blendStateOpaque;
 
-
-        Camera cam;
+        Player player;
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
         /// </summary>
@@ -67,6 +66,7 @@ namespace Kaibo_Crawler
             var blendStateDesc = SharpDX.Direct3D11.BlendStateDescription.Default();
             m_blendStateOpaque = BlendState.New(GraphicsDevice, "Opaque", blendStateDesc);
 
+
             Input.init(this);
         }
 
@@ -96,15 +96,15 @@ namespace Kaibo_Crawler
             m_simpleEffect.Parameters["diffuseSampler"].SetResource(m_linearSamplerState);
             base.LoadContent();
 
-
-            cam = new Camera(new Vector3(0.0f,10.0f,0.0f), GraphicsDevice);
+            player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
         }
 
         protected override void Update(GameTime gameTime)
         {
 
             Input.update();
-            cam.update();
+
+            player.update();
 
             if (Input.isClicked(Keys.Escape))
                 Exit();
@@ -123,7 +123,7 @@ namespace Kaibo_Crawler
             // things which did not change each frame. But in our case everything
             // is changing
             var transformCB = m_simpleEffect.ConstantBuffers["Transforms"];
-            transformCB.Parameters["worldViewProj"].SetValue(transformation * cam.viewProjection);
+            transformCB.Parameters["worldViewProj"].SetValue(transformation * player.cam.viewProjection);
             transformCB.Parameters["world"].SetValue(transformation);
             Matrix worldInvTr = Helpers.CreateInverseTranspose(ref transformation);
             transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);
