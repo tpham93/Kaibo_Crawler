@@ -16,7 +16,9 @@ namespace Kaibo_Crawler
 
         public Matrix viewProjection;
 
-        Vector3 position;
+        public Vector3 position;
+
+        Vector3 direction;
 
         float yaw;
         float pitch;
@@ -81,8 +83,10 @@ namespace Kaibo_Crawler
         public void updateMatrices() 
         {
             Matrix rotation = Matrix.RotationX(pitch) * Matrix.RotationY(yaw);
-            Vector3 transformedRef = Helpers.Transform(new Vector3(0, 0, -1),ref rotation);
-            Vector3 lookAt = position + transformedRef;
+
+            direction = Helpers.Transform(new Vector3(0, 0, -1),ref rotation);
+
+            Vector3 lookAt = position + direction;
 
             view = Matrix.LookAtRH(position, lookAt, Vector3.Up);
 
@@ -103,6 +107,11 @@ namespace Kaibo_Crawler
             dir = Helpers.Transform(dir,ref rotationY);
 
             position += dir;
+        }
+
+        public Vector3 getLookDirection()
+        {
+            return direction;
         }
 
     }
