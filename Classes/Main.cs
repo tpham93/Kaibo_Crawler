@@ -16,6 +16,7 @@ namespace Kaibo_Crawler
         {
             using (var program = new Kaibo_Crawler())
                 program.Run();
+            
 
         }
     }

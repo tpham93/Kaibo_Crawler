@@ -11,6 +11,7 @@ namespace Kaibo_Crawler
     using Assimp;
     using System;
     using SharpDX.DirectInput;
+    using SharpDX.Toolkit.Input;
 
 
     /// <summary>
@@ -21,13 +22,14 @@ namespace Kaibo_Crawler
         private GraphicsDeviceManager m_graphicsDeviceManager;
         private Model m_model;
         private SharpDX.Toolkit.Graphics.Effect m_simpleEffect;
-        private Matrix m_viewProjection;
 
         RasterizerState m_backfaceCullingState;
         DepthStencilState m_depthStencilStateState;
         SamplerState m_linearSamplerState;
         BlendState m_blendStateOpaque;
 
+
+        Camera cam;
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
         /// </summary>
@@ -41,6 +43,7 @@ namespace Kaibo_Crawler
             // Setup the relative directory to the executable directory
             // for loading contents with the ContentManager
             Content.RootDirectory = "content";
+
         }
 
         protected override void Initialize()
@@ -48,18 +51,6 @@ namespace Kaibo_Crawler
             base.Initialize();
 
             Window.Title = "Kaibo Crawler";
-
-            // Setup Camera
-            Matrix view = Matrix.LookAtRH(
-                new Vector3(0.0f, 40.0f, -90.0f),   // Position
-                new Vector3(0.0f, 20.0f, 0.0f),     // At (point which is centered in the middle of the screen).
-                new Vector3(0.0f, 1.0f, 0.0f));     // Up
-            Matrix projection = Matrix.PerspectiveFovRH(
-                0.6f,                               // Field of view
-                (float)GraphicsDevice.BackBuffer.Width / GraphicsDevice.BackBuffer.Height,  // Aspect ratio
-                0.5f,                               // Near clipping plane
-                200.0f);                            // Far clipping plane
-            m_viewProjection = view * projection;
 
             // Setup states
             var rasterizerStateDesc = SharpDX.Direct3D11.RasterizerStateDescription.Default();
@@ -75,6 +66,8 @@ namespace Kaibo_Crawler
 
             var blendStateDesc = SharpDX.Direct3D11.BlendStateDescription.Default();
             m_blendStateOpaque = BlendState.New(GraphicsDevice, "Opaque", blendStateDesc);
+
+            Input.init(this);
         }
 
         protected override void LoadContent()
@@ -102,14 +95,21 @@ namespace Kaibo_Crawler
             m_simpleEffect = new SharpDX.Toolkit.Graphics.Effect(GraphicsDevice, simpleShaderCompileResult.EffectData);
             m_simpleEffect.Parameters["diffuseSampler"].SetResource(m_linearSamplerState);
             base.LoadContent();
+
+
+            cam = new Camera(new Vector3(0.0f,10.0f,0.0f), GraphicsDevice);
         }
 
         protected override void Update(GameTime gameTime)
         {
+
+            Input.update();
+            cam.update();
+
+            if (Input.isClicked(Keys.Escape))
+                Exit();
+
             base.Update(gameTime);
-
-
-
         }
 
         private void drawModel(Model model, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, Matrix scale, Matrix rotation, Matrix translation, GameTime gameTime)
@@ -123,7 +123,7 @@ namespace Kaibo_Crawler
             // things which did not change each frame. But in our case everything
             // is changing
             var transformCB = m_simpleEffect.ConstantBuffers["Transforms"];
-            transformCB.Parameters["worldViewProj"].SetValue(transformation * m_viewProjection);
+            transformCB.Parameters["worldViewProj"].SetValue(transformation * cam.viewProjection);
             transformCB.Parameters["world"].SetValue(transformation);
             Matrix worldInvTr = Helpers.CreateInverseTranspose(ref transformation);
             transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);
