@@ -65,10 +65,10 @@ namespace Kaibo_Crawler
             startPosition = loadData.StartPosition;
         }
 
-        public bool intersects(BoundingBox playerBoundingBox)
+        public bool intersects(Vector3 playerPosition, Vector2 size)
         {
-            Vector3 playerPosition = playerBoundingBox.Minimum + (playerBoundingBox.Maximum - playerBoundingBox.Minimum) / 2;
             Vector2 playerTilePosition = worldToTileCoordinates(playerPosition);
+            Rectangle playerRect = new Rectangle((int)playerPosition.X, (int)playerPosition.Y, (int)size.X, (int)size.Y);
             for (int x = (int)playerTilePosition.X - 1; x < (int)playerTilePosition.X + 2; ++x)
             {
                 for (int y = (int)playerTilePosition.X - 1; y < (int)playerTilePosition.X + 2; ++y)
@@ -78,8 +78,8 @@ namespace Kaibo_Crawler
                     {
                         case TileType.Wall:
                         case TileType.Door:
-                            BoundingBox boundingBox = new BoundingBox(new Vector3(x * tileSize.Width, y * tileSize.Height, 0), new Vector3((x + 1) * tileSize.Width, (y + 1) * tileSize.Height, 0));
-                            if (boundingBox.Intersects(playerBoundingBox))
+                            Rectangle tileRect = new Rectangle(x*tileSize.Width, y*tileSize.Height, tileSize.Width, tileSize.Height);
+                            if (playerRect.Intersects(tileRect))
                             {
                                 return true;
                             }
@@ -161,6 +161,11 @@ namespace Kaibo_Crawler
 
             Random r = new Random();
             return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
+        }
+
+        public void Draw()
+        {
+
         }
     }
 }

@@ -114,31 +114,6 @@ namespace Kaibo_Crawler
             base.Update(gameTime);
         }
 
-        private void drawModel(Model model, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, Matrix scale, Matrix rotation, Matrix translation, GameTime gameTime)
-        {
-            drawModel(model, graphicsDevice, effect, scale * rotation * translation, gameTime);
-        }
-
-        private void drawModel(Model model, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, Matrix transformation, GameTime gameTime)
-        {
-            // Fill the one constant buffer. Hint: it is not necessary to set
-            // things which did not change each frame. But in our case everything
-            // is changing
-            var transformCB = m_simpleEffect.ConstantBuffers["Transforms"];
-            transformCB.Parameters["worldViewProj"].SetValue(transformation * player.Cam.ViewProjection);
-            transformCB.Parameters["world"].SetValue(transformation);
-            Matrix worldInvTr = Helpers.CreateInverseTranspose(ref transformation);
-            transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);
-
-            // Slow rotating light
-            double angle = -gameTime.TotalGameTime.TotalMilliseconds / 3000.0;
-            transformCB.Parameters["lightPos"].SetValue(new Vector3((float)Math.Sin(angle) * 50.0f, 30.0f, (float)Math.Cos(angle) * 50.0f));
-
-            // Draw model
-            m_simpleEffect.CurrentTechnique.Passes[0].Apply();
-            m_model.Draw(GraphicsDevice, m_simpleEffect);
-        }
-
         protected override void Draw(GameTime gameTime)
         {
             // Clears the screen
@@ -154,7 +129,7 @@ namespace Kaibo_Crawler
             // Defines the transformation for the next model to be drawn
             Matrix transformation = Matrix.RotationY((float)gameTime.TotalGameTime.TotalMilliseconds / 1000.0f);
             // Draws the model
-            drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, gameTime);
+            Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
 
             base.Draw(gameTime);
         }
