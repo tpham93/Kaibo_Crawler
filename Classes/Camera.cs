@@ -11,19 +11,32 @@ namespace Kaibo_Crawler
 {
     class Camera
     {
-        Matrix projection;
-        Matrix view;
+        private Matrix projection;
+        private Matrix view;
+        private Matrix viewProjection;
 
-        public Matrix viewProjection;
-        public Vector3 direction;
+        private Vector3 direction;
+        private float yaw;
+        private float pitch;
 
-        public float yaw;
-        float pitch;
+        private float rotationSpeed;
 
-        float rotationSpeed;
+        private float oldMouseX;
+        private float oldMouseY;
 
-        float oldMouseX;
-        float oldMouseY;
+
+        public Matrix ViewProjection
+        {
+            get { return viewProjection; }
+        }
+        public Vector3 Direction
+        {
+            get { return direction; }
+        }
+        public float Yaw
+        {
+            get { return yaw; }
+        }
 
         public Camera(Vector3 position, GraphicsDevice graphics)
         {

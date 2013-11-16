@@ -101,14 +101,15 @@ namespace Kaibo_Crawler
 
         protected override void Update(GameTime gameTime)
         {
+            if (IsActive)
+            {
+                Input.update();
 
-            Input.update();
+                player.update();
 
-            player.update();
-
-            if (Input.isClicked(Keys.Escape))
-                Exit();
-
+                if (Input.isClicked(Keys.Escape))
+                    Exit();
+            }
             base.Update(gameTime);
         }
 
@@ -123,7 +124,7 @@ namespace Kaibo_Crawler
             // things which did not change each frame. But in our case everything
             // is changing
             var transformCB = m_simpleEffect.ConstantBuffers["Transforms"];
-            transformCB.Parameters["worldViewProj"].SetValue(transformation * player.cam.viewProjection);
+            transformCB.Parameters["worldViewProj"].SetValue(transformation * player.Cam.ViewProjection);
             transformCB.Parameters["world"].SetValue(transformation);
             Matrix worldInvTr = Helpers.CreateInverseTranspose(ref transformation);
             transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);

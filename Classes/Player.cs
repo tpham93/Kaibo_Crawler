@@ -11,10 +11,23 @@ namespace Kaibo_Crawler
 {
     class Player
     {
-        public Camera cam;
-        public Vector3 position;
+        private Camera cam;
+        private Vector3 position;
+        private float moveSpeed = 0.5f;
+        private bool key;
 
-        float moveSpeed = 0.5f;
+        public Camera Cam
+        {
+            get { return cam; }
+        }
+        public Vector3 Position
+        {
+            get { return position; }
+        }
+        public Vector3 Direction
+        {
+            get { return cam.Direction; }
+        }
 
         public Player(Vector3 position, GraphicsDevice graphics)
         {
@@ -38,15 +51,19 @@ namespace Kaibo_Crawler
             cam.update(position);
         }
 
-        private void move(Vector3 direction) 
+        private void move(Vector3 direction)
         {
-            Matrix rotationY = Matrix.RotationY(cam.yaw);
+            Matrix rotationY = Matrix.RotationY(cam.Yaw);
             position += Helpers.Transform(direction, ref rotationY);
         }
 
-        public Vector3 getLookDirection() 
+        public void addKey()
         {
-            return cam.direction;
+            key = true;
+        }
+        public bool hasKey()
+        {
+            return key;
         }
     }
 }
