@@ -44,16 +44,16 @@ namespace Kaibo_Crawler
             this.rotationSpeed = 0.5f;
 
             view = Matrix.LookAtRH(
-                position,   // Position
-                new Vector3(0.0f, 20.0f, 0.0f),     // At (point which is centered in the middle of the screen).
-                Vector3.Up);     // Up
+                position,                                                       // Position
+                new Vector3(0.0f, 20.0f, 0.0f),                                 // At (point which is centered in the middle of the screen).
+                Vector3.Up);                                                    // Up
 
 
             projection = Matrix.PerspectiveFovRH(
-                0.6f,                               // Field of view
+                0.6f,                                                           // Field of view
                 (float)graphics.BackBuffer.Width / graphics.BackBuffer.Height,  // Aspect ratio
-                0.5f,                               // Near clipping plane
-                200.0f);                            // Far clipping plane
+                0.5f,                                                           // Near clipping plane
+                200.0f);                                                        // Far clipping plane
 
         }
 

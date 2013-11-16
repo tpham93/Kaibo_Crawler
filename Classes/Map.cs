@@ -8,7 +8,7 @@ using SharpDX;
 using SharpDX.Toolkit.Content;
 using SharpDX.Toolkit.Graphics;
 
-namespace Kaibo_Crawler.Classes
+namespace Kaibo_Crawler
 {
     class Map
     {
@@ -41,10 +41,10 @@ namespace Kaibo_Crawler.Classes
             }
         }
 
-        private static readonly Color STARTPOINT_COLOR = Color.White;
-        private static readonly Color FLOOR_COLOR = Color.White;
-        private static readonly Color FLOOR_WITH_KEY_COLOR = Color.Blue;
-        private static readonly Color DOOR_COLOR = Color.Red;
+        private static readonly Color STARTPOINT_COLOR = new Color(0, 255, 0);
+        private static readonly Color FLOOR_COLOR = new Color(255, 255, 255);
+        private static readonly Color FLOOR_WITH_KEY_COLOR = new Color(0, 0, 255);
+        private static readonly Color DOOR_COLOR = new Color(255, 0, 0);
 
         private string filepath;
         private Size2 tileSize;
@@ -69,16 +69,16 @@ namespace Kaibo_Crawler.Classes
         {
             Vector3 playerPosition = playerBoundingBox.Minimum + (playerBoundingBox.Maximum - playerBoundingBox.Minimum) / 2;
             Vector2 playerTilePosition = worldToTileCoordinates(playerPosition);
-            for (int x = (int)playerTilePosition.X-1; x < (int)playerTilePosition.X+2; ++x)
+            for (int x = (int)playerTilePosition.X - 1; x < (int)playerTilePosition.X + 2; ++x)
             {
-                for (int y = (int)playerTilePosition.X-1; y < (int)playerTilePosition.X+2; ++y)
+                for (int y = (int)playerTilePosition.X - 1; y < (int)playerTilePosition.X + 2; ++y)
                 {
-                    TileType type = tiles[x,y];
+                    TileType type = tiles[x, y];
                     switch (type)
                     {
                         case TileType.Wall:
                         case TileType.Door:
-                            BoundingBox boundingBox = new BoundingBox(new Vector3(x * tileSize.Width, y * tileSize.Height, 0), new Vector3((x+1) * tileSize.Width, (y+1) * tileSize.Height, 0));
+                            BoundingBox boundingBox = new BoundingBox(new Vector3(x * tileSize.Width, y * tileSize.Height, 0), new Vector3((x + 1) * tileSize.Width, (y + 1) * tileSize.Height, 0));
                             if (boundingBox.Intersects(playerBoundingBox))
                             {
                                 return true;
@@ -92,9 +92,10 @@ namespace Kaibo_Crawler.Classes
             return false;
         }
 
-        public void trigger(Player player){
-            Vector2 playerTileLookAt = worldToTileCoordinates(player.Position+Vector3.Normalize(player.Direction)*Math.Min(tileSize.Width,tileSize.Height));
-            TileType type = tiles[(int)playerTileLookAt.X,(int)playerTileLookAt.Y];
+        public void trigger(Player player)
+        {
+            Vector2 playerTileLookAt = worldToTileCoordinates(player.Position + Vector3.Normalize(player.Direction) * Math.Min(tileSize.Width, tileSize.Height));
+            TileType type = tiles[(int)playerTileLookAt.X, (int)playerTileLookAt.Y];
             switch (type)
             {
                 case TileType.Floor_With_Key:
@@ -128,12 +129,12 @@ namespace Kaibo_Crawler.Classes
             {
                 for (int x = 0; x < t.Width; ++x)
                 {
-                    Color currentPixel = pixel[x+y*t.Height];
+                    Color currentPixel = pixel[x + y * t.Height];
                     if (currentPixel == FLOOR_COLOR)
                     {
                         tiles[x, y] = TileType.Floor;
                     }
-                    else if(currentPixel == STARTPOINT_COLOR)
+                    else if (currentPixel == STARTPOINT_COLOR)
                     {
                         startPositions.Add(new Vector2(x, y));
                         tiles[x, y] = TileType.Floor;
@@ -155,11 +156,11 @@ namespace Kaibo_Crawler.Classes
 
             if (startPositions.Count == 0)
             {
-                throw new Exception("0 startpoints found!");
+                throw new Exception("no startpoint found!");
             }
 
             Random r = new Random();
-            return new LoadData(tiles,startPositions[r.Next() % startPositions.Count]);
+            return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
         }
     }
 }
