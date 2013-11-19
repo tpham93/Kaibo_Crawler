@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX;
+using SharpDX.Toolkit;
 using SharpDX.Toolkit.Content;
 using SharpDX.Toolkit.Graphics;
 
@@ -18,6 +19,7 @@ namespace Kaibo_Crawler
             Floor,
             Floor_With_Key,
             Door,
+            Count
         }
 
         private struct LoadData
@@ -46,6 +48,8 @@ namespace Kaibo_Crawler
         private static readonly Color FLOOR_WITH_KEY_COLOR = new Color(0, 0, 255);
         private static readonly Color DOOR_COLOR = new Color(255, 0, 0);
 
+        private Model model;
+
         private string filepath;
         private Size2 tileSize;
         private TileType[,] tiles;
@@ -58,11 +62,15 @@ namespace Kaibo_Crawler
             this.tileSize = tileSize;
         }
 
-        public void LoadContent(GraphicsDevice device)
+        public void LoadContent(GraphicsDevice device, ContentManager content)
         {
             LoadData loadData = LoadMapData(device, filepath);
             tiles = loadData.Tiles;
             startPosition = loadData.StartPosition;
+            var importer = new Assimp.AssimpImporter();
+            string fileName = System.IO.Path.GetFullPath(content.RootDirectory + "/snowman.3ds");
+            Assimp.Scene scene = importer.ImportFile(fileName, Assimp.PostProcessSteps.MakeLeftHanded);
+            model = new Model(scene, device, content);
         }
 
         public bool intersects(Vector3 playerPosition, Vector2 size)
@@ -163,9 +171,20 @@ namespace Kaibo_Crawler
             return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
         }
 
-        public void Draw()
+        public void Draw(Matrix viewProjection,GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
         {
+            Matrix transformation = Matrix.Identity;
 
+            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            {
+                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                {
+                    if(tiles[x,y] == TileType.Wall){
+                        transformation = Matrix.Translation(x * tileSize.Width, -2, y * tileSize.Height);
+                        Helpers.drawModel(model, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                    }
+                }
+            }
         }
     }
 }

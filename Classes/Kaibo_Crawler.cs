@@ -29,6 +29,9 @@ namespace Kaibo_Crawler
         BlendState m_blendStateOpaque;
 
         Player player;
+
+        Map map;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
         /// </summary>
@@ -97,7 +100,9 @@ namespace Kaibo_Crawler
             base.LoadContent();
 
             player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
-
+            map = new Map(@"Content\map.PNG",new Size2(5,5));
+            map.LoadContent(GraphicsDevice, Content);
+            
         }
 
         protected override void Update(GameTime gameTime)
@@ -129,8 +134,8 @@ namespace Kaibo_Crawler
             // Defines the transformation for the next model to be drawn
             Matrix transformation = Matrix.RotationY((float)gameTime.TotalGameTime.TotalMilliseconds / 1000.0f);
             // Draws the model
-            Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
-
+            //Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
+            map.Draw(player.Cam.ViewProjection, GraphicsDevice, m_simpleEffect, gameTime);
             base.Draw(gameTime);
         }
     }
