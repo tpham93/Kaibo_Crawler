@@ -12,6 +12,7 @@ namespace Kaibo_Crawler
     class Player
     {
         private Camera cam;
+        private Map map;
         private Vector3 position;
         private float moveSpeed = 0.5f;
         private bool key;
@@ -19,6 +20,14 @@ namespace Kaibo_Crawler
         public Camera Cam
         {
             get { return cam; }
+        }
+        public Map Map
+        {
+            get { return map; }
+            set {
+                map = value;
+                position = value.StartPosition;
+            }
         }
         public Vector3 Position
         {
@@ -36,17 +45,21 @@ namespace Kaibo_Crawler
 
         public void update()
         {
-            if (Input.isPressed(Keys.W))
-                move(Vector3.UnitZ * -moveSpeed);
+            Vector3 moveVector = new Vector3();
 
-            else if (Input.isPressed(Keys.S))
-                move(Vector3.UnitZ * moveSpeed);
+            if (Input.isPressed(Keys.W))
+                moveVector += (Vector3.UnitZ * -moveSpeed);
+
+            if (Input.isPressed(Keys.S))
+                moveVector += (Vector3.UnitZ * moveSpeed);
 
             if (Input.isPressed(Keys.A))
-                move(Vector3.UnitX * -moveSpeed);
+                moveVector += (Vector3.UnitX * -moveSpeed);
 
-            else if (Input.isPressed(Keys.D))
-                move(Vector3.UnitX * moveSpeed);
+            if (Input.isPressed(Keys.D))
+                moveVector += (Vector3.UnitX * moveSpeed);
+
+            move(moveVector);
 
             cam.update(position);
         }
@@ -54,7 +67,17 @@ namespace Kaibo_Crawler
         private void move(Vector3 direction)
         {
             Matrix rotationY = Matrix.RotationY(cam.Yaw);
-            position += Helpers.Transform(direction, ref rotationY);
+            Vector3 movement =Helpers.Transform(direction, ref rotationY);
+
+            if (!map.intersects(position + Vector3.UnitX * movement.X, new Vector2(5, 5)))
+            {
+                position += Vector3.UnitX * movement.X;
+            }
+            if (!map.intersects(position + Vector3.UnitZ * movement.Z, new Vector2(5, 5)))
+            {
+                position += Vector3.UnitZ * movement.Z;
+            }
+
         }
 
         public void addKey()

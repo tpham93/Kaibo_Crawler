@@ -55,6 +55,10 @@ namespace Kaibo_Crawler
         private TileType[,] tiles;
         private Vector2 startPosition;
 
+        public Vector3 StartPosition
+        {
+            get { return new Vector3((startPosition.X + 0.5f) * tileSize.Width, 0, (startPosition.Y + 0.5f) * tileSize.Height); }
+        }
 
         public Map(string filepath, Size2 tileSize)
         {
@@ -68,35 +72,45 @@ namespace Kaibo_Crawler
             tiles = loadData.Tiles;
             startPosition = loadData.StartPosition;
             var importer = new Assimp.AssimpImporter();
-            string fileName = System.IO.Path.GetFullPath(content.RootDirectory + "/snowman.3ds");
+            string fileName = System.IO.Path.GetFullPath(content.RootDirectory + "/wall.3ds");
             Assimp.Scene scene = importer.ImportFile(fileName, Assimp.PostProcessSteps.MakeLeftHanded);
             model = new Model(scene, device, content);
         }
 
         public bool intersects(Vector3 playerPosition, Vector2 size)
         {
-            Vector2 playerTilePosition = worldToTileCoordinates(playerPosition);
-            Rectangle playerRect = new Rectangle((int)playerPosition.X, (int)playerPosition.Y, (int)size.X, (int)size.Y);
-            for (int x = (int)playerTilePosition.X - 1; x < (int)playerTilePosition.X + 2; ++x)
+            Point playerTilePosition = worldToTileCoordinates(playerPosition);
+
+
+            if (playerTilePosition.X >= 0 || playerTilePosition.Y >= 0 || playerTilePosition.X <= tiles.GetUpperBound(0) || playerTilePosition.Y <= tiles.GetUpperBound(1))
             {
-                for (int y = (int)playerTilePosition.X - 1; y < (int)playerTilePosition.X + 2; ++y)
+
+                Point[] corners = new Point[4];
+                corners[0] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, -size.Y));
+                corners[1] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, size.Y));
+                corners[2] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, -size.Y));
+                corners[3] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, -size.Y));
+
+                for (int i = 0; i < corners.Length; ++i)
                 {
-                    TileType type = tiles[x, y];
-                    switch (type)
+                    int x = corners[i].X;
+                    int y = corners[i].Y;
+
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
-                        case TileType.Wall:
-                        case TileType.Door:
-                            Rectangle tileRect = new Rectangle(x*tileSize.Width, y*tileSize.Height, tileSize.Width, tileSize.Height);
-                            if (playerRect.Intersects(tileRect))
-                            {
+                        TileType type = tiles[x, y];
+                        switch (type)
+                        {
+                            case TileType.Wall:
+                            case TileType.Door:
                                 return true;
-                            }
-                            break;
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
+
             return false;
         }
 
@@ -121,9 +135,9 @@ namespace Kaibo_Crawler
             }
         }
 
-        private Vector2 worldToTileCoordinates(Vector3 worldCoordinate)
+        private Point worldToTileCoordinates(Vector3 worldCoordinate)
         {
-            return new Vector2((int)(worldCoordinate.X) / tileSize.Width, (int)(worldCoordinate.Z) / tileSize.Height);
+            return new Point((int)(worldCoordinate.X) / tileSize.Width, (int)(worldCoordinate.Z) / tileSize.Height);
         }
 
         private static LoadData LoadMapData(GraphicsDevice device, string filepath)
@@ -171,16 +185,26 @@ namespace Kaibo_Crawler
             return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
         }
 
-        public void Draw(Matrix viewProjection,GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
+        public void Draw(Matrix viewProjection, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
         {
             Matrix transformation = Matrix.Identity;
 
-            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            for (int x = -1; x <= tiles.GetUpperBound(0)+1; ++x)
             {
-                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                for (int y = -1; y <= tiles.GetUpperBound(1)+1; ++y)
                 {
-                    if(tiles[x,y] == TileType.Wall){
-                        transformation = Matrix.Translation(x * tileSize.Width, -2, y * tileSize.Height);
+
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
+                    {
+                        if (tiles[x, y] == TileType.Wall)
+                        {
+                            transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
+                            Helpers.drawModel(model, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                        }
+                    }
+                    else
+                    {
+                        transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
                         Helpers.drawModel(model, graphicsDevice, effect, transformation, viewProjection, gameTime);
                     }
                 }

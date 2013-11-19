@@ -99,10 +99,10 @@ namespace Kaibo_Crawler
             m_simpleEffect.Parameters["diffuseSampler"].SetResource(m_linearSamplerState);
             base.LoadContent();
 
-            player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
-            map = new Map(@"Content\map.PNG",new Size2(5,5));
+            map = new Map(@"Content\map.PNG", new Size2(20, 20));
             map.LoadContent(GraphicsDevice, Content);
-            
+            player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
+            player.Map = map;
         }
 
         protected override void Update(GameTime gameTime)
@@ -132,7 +132,7 @@ namespace Kaibo_Crawler
 
 
             // Defines the transformation for the next model to be drawn
-            Matrix transformation = Matrix.RotationY((float)gameTime.TotalGameTime.TotalMilliseconds / 1000.0f);
+            //Matrix transformation = Matrix.RotationY((float)gameTime.TotalGameTime.TotalMilliseconds / 1000.0f);
             // Draws the model
             //Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
             map.Draw(player.Cam.ViewProjection, GraphicsDevice, m_simpleEffect, gameTime);
