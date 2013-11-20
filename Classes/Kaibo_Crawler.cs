@@ -45,6 +45,10 @@ namespace Kaibo_Crawler
             // Setup the relative directory to the executable directory
             // for loading contents with the ContentManager
             Content.RootDirectory = "content";
+            //m_graphicsDeviceManager.IsFullScreen = true;
+
+            //m_graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.Default.GetOutputAt(0).CurrentDisplayMode.Width;
+            //m_graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.Default.GetOutputAt(0).CurrentDisplayMode.Height;
 
         }
 
@@ -68,7 +72,6 @@ namespace Kaibo_Crawler
 
             var blendStateDesc = SharpDX.Direct3D11.BlendStateDescription.Default();
             m_blendStateOpaque = BlendState.New(GraphicsDevice, "Opaque", blendStateDesc);
-
 
             Input.init(this);
         }

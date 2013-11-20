@@ -118,6 +118,10 @@ namespace Kaibo_Crawler
                     }
                 }
             }
+            else
+            {
+                return true;
+            }
 
             return false;
         }
@@ -197,23 +201,19 @@ namespace Kaibo_Crawler
         {
             Matrix transformation = Matrix.Identity;
 
-            for (int x = -1; x <= tiles.GetUpperBound(0)+1; ++x)
+            for (int y = -1; y <= tiles.GetUpperBound(1) + 1; ++y)
             {
-                for (int y = -1; y <= tiles.GetUpperBound(1)+1; ++y)
+                for (int x = -1; x <= tiles.GetUpperBound(0) + 1; ++x)
                 {
 
                     if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
-
                         switch (tiles[x, y])
                         {
                             case TileType.Wall:
+                            case TileType.Door:
                                 transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
                                 Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
-                                break;
-                            case TileType.Floor:
-                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
-                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
                                 break;
                         }
                     }
@@ -224,6 +224,23 @@ namespace Kaibo_Crawler
                     }
                 }
             }
+            for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+            {
+                for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+                {
+                    {
+                        switch (tiles[x, y])
+                        {
+                            case TileType.Floor:
+                            case TileType.Floor_With_Key:
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                                break;
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
