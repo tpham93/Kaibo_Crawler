@@ -11,6 +11,9 @@ namespace Kaibo_Crawler
 {
     class Player
     {
+
+     
+
         private Camera cam;
         private Map map;
         private Vector3 position;

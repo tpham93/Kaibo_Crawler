@@ -54,7 +54,7 @@ namespace Kaibo_Crawler
             double angle = -gameTime.TotalGameTime.TotalMilliseconds / 3000.0;
 
             //transformCB.Parameters["lightPos"].SetValue(new Vector3((float)Math.Sin(angle) * 50.0f, 30.0f, (float)Math.Cos(angle) * 50.0f));
-            transformCB.Parameters["lightPos"].SetValue(player.Position);
+            //transformCB.Parameters["lightPos"].SetValue(player.Position);
 
             // Draw model
             effect.CurrentTechnique.Passes[0].Apply();
