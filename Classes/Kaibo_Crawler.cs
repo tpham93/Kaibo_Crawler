@@ -138,7 +138,7 @@ namespace Kaibo_Crawler
             //Matrix transformation = Matrix.RotationY((float)gameTime.TotalGameTime.TotalMilliseconds / 1000.0f);
             // Draws the model
             //Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
-            map.Draw(player.Cam.ViewProjection, GraphicsDevice, m_simpleEffect, gameTime);
+            map.Draw(player, GraphicsDevice, m_simpleEffect, gameTime);
             base.Draw(gameTime);
         }
     }

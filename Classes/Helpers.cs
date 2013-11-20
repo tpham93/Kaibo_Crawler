@@ -37,25 +37,24 @@ namespace Kaibo_Crawler
         }
 
 
-        public static void drawModel(Model model, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, Matrix scale, Matrix rotation, Matrix translation, Matrix viewProjection, GameTime gameTime)
-        {
-            drawModel(model, graphicsDevice, effect, scale * rotation * translation, viewProjection, gameTime);
-        }
 
-        public static void drawModel(Model model, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, Matrix transformation, Matrix viewProjection, GameTime gameTime)
+
+        public static void drawModel(Model model, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, Matrix transformation, Player player, GameTime gameTime)
         {
             // Fill the one constant buffer. Hint: it is not necessary to set
             // things which did not change each frame. But in our case everything
             // is changing
             var transformCB = effect.ConstantBuffers["Transforms"];
-            transformCB.Parameters["worldViewProj"].SetValue(transformation * viewProjection);
+            transformCB.Parameters["worldViewProj"].SetValue(transformation * player.Cam.ViewProjection);
             transformCB.Parameters["world"].SetValue(transformation);
             Matrix worldInvTr = Helpers.CreateInverseTranspose(ref transformation);
             transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);
 
             // Slow rotating light
             double angle = -gameTime.TotalGameTime.TotalMilliseconds / 3000.0;
-            transformCB.Parameters["lightPos"].SetValue(new Vector3((float)Math.Sin(angle) * 50.0f, 30.0f, (float)Math.Cos(angle) * 50.0f));
+
+            //transformCB.Parameters["lightPos"].SetValue(new Vector3((float)Math.Sin(angle) * 50.0f, 30.0f, (float)Math.Cos(angle) * 50.0f));
+            transformCB.Parameters["lightPos"].SetValue(player.Position);
 
             // Draw model
             effect.CurrentTechnique.Passes[0].Apply();

@@ -11,9 +11,9 @@ namespace Kaibo_Crawler
 {
     class Camera
     {
-        private Matrix projection;
-        private Matrix view;
-        private Matrix viewProjection;
+        public Matrix projection;
+        public Matrix view;
+        public Matrix viewProjection;
 
         private Vector3 direction;
         private float yaw;
@@ -53,7 +53,7 @@ namespace Kaibo_Crawler
                 0.6f,                                                           // Field of view
                 (float)graphics.BackBuffer.Width / graphics.BackBuffer.Height,  // Aspect ratio
                 0.5f,                                                           // Near clipping plane
-                200.0f);                                                        // Far clipping plane
+                500.0f);                                                        // Far clipping plane
 
         }
 

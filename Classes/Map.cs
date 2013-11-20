@@ -197,7 +197,7 @@ namespace Kaibo_Crawler
             return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
         }
 
-        public void Draw(Matrix viewProjection, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
+        public void Draw(Player player, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
         {
             Matrix transformation = Matrix.Identity;
 
@@ -213,14 +213,14 @@ namespace Kaibo_Crawler
                             case TileType.Wall:
                             case TileType.Door:
                                 transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
-                                Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                                Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
                                 break;
                         }
                     }
                     else
                     {
                         transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
-                        Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                        Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
                     }
                 }
             }
