@@ -24,7 +24,8 @@ namespace Kaibo_Crawler
         public Map Map
         {
             get { return map; }
-            set {
+            set
+            {
                 map = value;
                 position = value.StartPosition;
             }
@@ -59,7 +60,8 @@ namespace Kaibo_Crawler
             if (Input.isPressed(Keys.D))
                 moveVector += (Vector3.UnitX * moveSpeed);
 
-            move(moveVector);
+            if (moveVector != Vector3.Zero)
+                move(moveVector);
 
             cam.update(position);
         }
@@ -67,7 +69,7 @@ namespace Kaibo_Crawler
         private void move(Vector3 direction)
         {
             Matrix rotationY = Matrix.RotationY(cam.Yaw);
-            Vector3 movement =Helpers.Transform(direction, ref rotationY);
+            Vector3 movement = Helpers.Transform(direction, ref rotationY);
 
             if (!map.intersects(position + Vector3.UnitX * movement.X, new Vector2(5, 5)))
             {

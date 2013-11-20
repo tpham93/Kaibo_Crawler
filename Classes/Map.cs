@@ -48,7 +48,8 @@ namespace Kaibo_Crawler
         private static readonly Color FLOOR_WITH_KEY_COLOR = new Color(0, 0, 255);
         private static readonly Color DOOR_COLOR = new Color(255, 0, 0);
 
-        private Model model;
+        private Model wallModel;
+        private Model floorModel;
 
         private string filepath;
         private Size2 tileSize;
@@ -72,9 +73,16 @@ namespace Kaibo_Crawler
             tiles = loadData.Tiles;
             startPosition = loadData.StartPosition;
             var importer = new Assimp.AssimpImporter();
+
+
             string fileName = System.IO.Path.GetFullPath(content.RootDirectory + "/wall.3ds");
             Assimp.Scene scene = importer.ImportFile(fileName, Assimp.PostProcessSteps.MakeLeftHanded);
-            model = new Model(scene, device, content);
+            wallModel = new Model(scene, device, content);
+
+            fileName = System.IO.Path.GetFullPath(content.RootDirectory + "/floor.3ds");
+            scene = importer.ImportFile(fileName, Assimp.PostProcessSteps.MakeLeftHanded);
+            floorModel = new Model(scene, device, content);
+
         }
 
         public bool intersects(Vector3 playerPosition, Vector2 size)
@@ -89,7 +97,7 @@ namespace Kaibo_Crawler
                 corners[0] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, -size.Y));
                 corners[1] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, size.Y));
                 corners[2] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, -size.Y));
-                corners[3] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, -size.Y));
+                corners[3] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, size.Y));
 
                 for (int i = 0; i < corners.Length; ++i)
                 {
@@ -196,16 +204,23 @@ namespace Kaibo_Crawler
 
                     if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
-                        if (tiles[x, y] == TileType.Wall)
+
+                        switch (tiles[x, y])
                         {
-                            transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
-                            Helpers.drawModel(model, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                            case TileType.Wall:
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                                break;
+                            case TileType.Floor:
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                                break;
                         }
                     }
                     else
                     {
                         transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
-                        Helpers.drawModel(model, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                        Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
                     }
                 }
             }
