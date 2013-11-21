@@ -172,7 +172,7 @@ namespace Kaibo_Crawler
 
         private Point worldToTileCoordinates(Vector3 worldCoordinate)
         {
-            return new Point((int)(worldCoordinate.X) / tileSize.Width, (int)(worldCoordinate.Z) / tileSize.Height);
+            return new Point((int)((worldCoordinate.X + tileSize.Width) / tileSize.Width) - 1, (int)((worldCoordinate.Z + tileSize.Height) / tileSize.Height) - 1);
         }
 
         private static LoadData LoadMapData(GraphicsDevice device, string filepath)
@@ -280,9 +280,12 @@ namespace Kaibo_Crawler
 
             lightCB.Parameters["lights"].SetValue(pointLights);
 
-            for (int x = -1; x <= tiles.GetUpperBound(0) + 1; ++x)
+            Point playerTilePosition = worldToTileCoordinates(player.Position);
+            const int DRAWING_RANGE = 5;
+
+            for (int x = playerTilePosition.X - DRAWING_RANGE; x <= playerTilePosition.X + DRAWING_RANGE; ++x)
             {
-                for (int y = -1; y <= tiles.GetUpperBound(1) + 1; ++y)
+                for (int y = playerTilePosition.Y - DRAWING_RANGE; y <= playerTilePosition.Y + DRAWING_RANGE; ++y)
                 {
                     transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
                     if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
@@ -302,10 +305,11 @@ namespace Kaibo_Crawler
                     Helpers.drawModel(ceilingModel, graphicsDevice, effect, transformation, player, gameTime);
                 }
             }
-            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            for (int x = playerTilePosition.X - DRAWING_RANGE; x <= playerTilePosition.X + DRAWING_RANGE; ++x)
             {
-                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                for (int y = playerTilePosition.Y - DRAWING_RANGE; y <= playerTilePosition.Y + DRAWING_RANGE; ++y)
                 {
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
                         switch (tiles[x, y])
                         {
@@ -317,10 +321,11 @@ namespace Kaibo_Crawler
                     }
                 }
             }
-            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            for (int x = playerTilePosition.X - DRAWING_RANGE; x <= playerTilePosition.X + DRAWING_RANGE; ++x)
             {
-                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                for (int y = playerTilePosition.Y - DRAWING_RANGE; y <= playerTilePosition.Y + DRAWING_RANGE; ++y)
                 {
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
                         switch (tiles[x, y])
                         {
@@ -332,10 +337,11 @@ namespace Kaibo_Crawler
                     }
                 }
             }
-            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            for (int x = playerTilePosition.X - DRAWING_RANGE; x <= playerTilePosition.X + DRAWING_RANGE; ++x)
             {
-                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                for (int y = playerTilePosition.Y - DRAWING_RANGE; y <= playerTilePosition.Y + DRAWING_RANGE; ++y)
                 {
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
                         switch (tiles[x, y])
                         {
@@ -347,10 +353,11 @@ namespace Kaibo_Crawler
                     }
                 }
             }
-            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            for (int x = playerTilePosition.X - DRAWING_RANGE; x <= playerTilePosition.X + DRAWING_RANGE; ++x)
             {
-                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                for (int y = playerTilePosition.Y - DRAWING_RANGE; y <= playerTilePosition.Y + DRAWING_RANGE; ++y)
                 {
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
                         switch (tiles[x, y])
                         {
@@ -362,10 +369,11 @@ namespace Kaibo_Crawler
                     }
                 }
             }
-            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            for (int x = playerTilePosition.X - DRAWING_RANGE; x <= playerTilePosition.X + DRAWING_RANGE; ++x)
             {
-                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                for (int y = playerTilePosition.Y - DRAWING_RANGE; y <= playerTilePosition.Y + DRAWING_RANGE; ++y)
                 {
+                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                     {
                         switch (tiles[x, y])
                         {

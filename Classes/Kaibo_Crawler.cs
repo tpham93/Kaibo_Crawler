@@ -136,7 +136,7 @@ namespace Kaibo_Crawler
         protected override void Draw(GameTime gameTime)
         {
             // Clears the screen
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
 
 
