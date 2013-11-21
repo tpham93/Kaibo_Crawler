@@ -1,11 +1,13 @@
-﻿using SharpDX;
-using SharpDX.Toolkit.Graphics;
-using SharpDX.Toolkit.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using SharpDX;
+using SharpDX.Toolkit;
+using SharpDX.Toolkit.Graphics;
+using SharpDX.Toolkit.Input;
 
 namespace Kaibo_Crawler
 {
@@ -16,6 +18,8 @@ namespace Kaibo_Crawler
         private Vector3 position;
         private float moveSpeed = 0.5f;
         private bool key;
+        private bool isMoving;
+        private TimeSpan movingTime;
 
         public Camera Cam
         {
@@ -38,13 +42,22 @@ namespace Kaibo_Crawler
         {
             get { return cam.Direction; }
         }
+        public bool IsMoving
+        {
+            get { return isMoving; }
+        }
+        public TimeSpan MovingTime
+        {
+            get { return movingTime; }
+        }
+
 
         public Player(Vector3 position, GraphicsDevice graphics)
         {
             cam = new Camera(position, graphics);
         }
 
-        public void update()
+        public void update(GameTime gameTime)
         {
             Vector3 moveVector = new Vector3();
 
@@ -61,7 +74,16 @@ namespace Kaibo_Crawler
                 moveVector += (Vector3.UnitX * moveSpeed);
 
             if (moveVector != Vector3.Zero)
+            {
+                isMoving = true;
+                movingTime += gameTime.ElapsedGameTime;
                 move(moveVector);
+            }
+            else
+            {
+                isMoving = false;
+                movingTime = new TimeSpan();
+            }
 
             cam.update(position);
         }

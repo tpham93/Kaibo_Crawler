@@ -56,6 +56,8 @@ namespace Kaibo_Crawler
         private TileType[,] tiles;
         private Vector2 startPosition;
 
+        float height;
+
         public Vector3 StartPosition
         {
             get { return new Vector3((startPosition.X + 0.5f) * tileSize.Width, 0, (startPosition.Y + 0.5f) * tileSize.Height); }
@@ -65,6 +67,7 @@ namespace Kaibo_Crawler
         {
             this.filepath = filepath;
             this.tileSize = tileSize;
+            height = 0;
         }
 
         public void LoadContent(GraphicsDevice device, ContentManager content)
@@ -201,6 +204,14 @@ namespace Kaibo_Crawler
         {
             Matrix transformation = Matrix.Identity;
 
+            if (player.IsMoving)
+            {
+                height = (float)Math.Pow(Math.Sin(player.MovingTime.TotalSeconds * 5), 2)*0.8f + 13;
+            }
+            else
+            {
+                height = Math.Max(height - 3f * (float)gameTime.ElapsedGameTime.TotalSeconds,13);
+            }
             for (int y = -1; y <= tiles.GetUpperBound(1) + 1; ++y)
             {
                 for (int x = -1; x <= tiles.GetUpperBound(0) + 1; ++x)
@@ -212,14 +223,14 @@ namespace Kaibo_Crawler
                         {
                             case TileType.Wall:
                             case TileType.Door:
-                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -height, (y + 0.5f) * tileSize.Height);
                                 Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
                                 break;
                         }
                     }
                     else
                     {
-                        transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
+                        transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -height, (y + 0.5f) * tileSize.Height);
                         Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
                     }
                 }
@@ -233,8 +244,8 @@ namespace Kaibo_Crawler
                         {
                             case TileType.Floor:
                             case TileType.Floor_With_Key:
-                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -10, (y + 0.5f) * tileSize.Height);
-                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, viewProjection, gameTime);
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -height, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, player, gameTime);
                                 break;
                         }
                     }

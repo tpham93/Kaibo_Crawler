@@ -114,7 +114,7 @@ namespace Kaibo_Crawler
             {
                 Input.update();
 
-                player.update();
+                player.update(gameTime);
 
                 if (Input.isClicked(Keys.Escape))
                     Exit();
