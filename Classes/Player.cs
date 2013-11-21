@@ -23,6 +23,7 @@ namespace Kaibo_Crawler
         private bool key;
         private bool isMoving;
         private TimeSpan movingTime;
+        private float height;
 
         public Camera Cam
         {
@@ -53,11 +54,17 @@ namespace Kaibo_Crawler
         {
             get { return movingTime; }
         }
+        public float Height
+        {
+            get { return height; }
+            set { height = value; }
+        }
 
 
         public Player(Vector3 position, GraphicsDevice graphics)
         {
             cam = new Camera(position, graphics);
+            height = 0;
         }
 
         public void update(GameTime gameTime)
@@ -96,11 +103,11 @@ namespace Kaibo_Crawler
             Matrix rotationY = Matrix.RotationY(cam.Yaw);
             Vector3 movement = Helpers.Transform(direction, ref rotationY);
 
-            if (!map.intersects(position + Vector3.UnitX * movement.X, new Vector2(5, 5)))
+            if (!map.intersects(position + Vector3.UnitX * movement.X, new Vector2(2, 2)))
             {
                 position += Vector3.UnitX * movement.X;
             }
-            if (!map.intersects(position + Vector3.UnitZ * movement.Z, new Vector2(5, 5)))
+            if (!map.intersects(position + Vector3.UnitZ * movement.Z, new Vector2(2, 2)))
             {
                 position += Vector3.UnitZ * movement.Z;
             }
