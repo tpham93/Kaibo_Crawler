@@ -187,35 +187,43 @@ namespace Kaibo_Crawler
             {
                 for (int x = 0; x < t.Width; ++x)
                 {
-                    Color currentPixel = pixel[x + y * t.Height];
+                    Color currentPixel = pixel[x + y * t.Width];
+                    currentPixel = new Color(currentPixel.B,currentPixel.G,currentPixel.R);
+
                     if (currentPixel == FLOOR_COLOR)
                     {
                         tiles[x, y] = TileType.Floor;
+                        Console.Out.Write("F");
                     }
                     else if (currentPixel == STARTPOINT_COLOR)
                     {
                         startPositions.Add(new Point(x, y));
                         tiles[x, y] = TileType.Floor;
+                        Console.Out.Write("S");
                     }
                     else if (currentPixel == FLOOR_WITH_KEY_COLOR)
                     {
                         keyPositions.Add(new Point(x, y));
                         tiles[x, y] = TileType.Floor;
+                        Console.Out.Write("K");
                     }
                     else if (currentPixel == DOOR_COLOR)
                     {
                         tiles[x, y] = TileType.Door;
+                        Console.Out.Write("D");
                     }
                     else if (currentPixel == GOAL_COLOR)
                     {
                         tiles[x, y] = TileType.Goal;
+                        Console.Out.Write("G");
                     }
                     else
                     {
                         tiles[x, y] = TileType.Wall;
+                        Console.Out.Write("_");
                     }
                 }
-                Console.WriteLine();
+                Console.Out.WriteLine();
             }
 
             if (startPositions.Count == 0)

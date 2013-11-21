@@ -21,7 +21,6 @@ namespace Kaibo_Crawler
     {
 
         private GraphicsDeviceManager m_graphicsDeviceManager;
-        private Model m_model;
         private SharpDX.Toolkit.Graphics.Effect m_simpleEffect;
 
         RasterizerState m_backfaceCullingState;
