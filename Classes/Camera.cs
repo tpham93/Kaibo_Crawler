@@ -36,6 +36,7 @@ namespace Kaibo_Crawler
         }
         public float Yaw
         {
+            set { yaw = value; }
             get { return yaw; }
         }
 

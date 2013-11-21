@@ -24,6 +24,7 @@ namespace Kaibo_Crawler
         private bool isMoving;
         private TimeSpan movingTime;
         private float height;
+        private bool won;
 
         public Camera Cam
         {
@@ -36,6 +37,8 @@ namespace Kaibo_Crawler
             {
                 map = value;
                 position = value.StartPosition;
+                Random r = new Random();
+                cam.Yaw = (float)(r.NextDouble() * 2 * Math.PI);
             }
         }
         public Vector3 Position
@@ -65,23 +68,26 @@ namespace Kaibo_Crawler
         {
             cam = new Camera(position, graphics);
             height = 0;
+            won = false;
         }
 
         public void update(GameTime gameTime)
         {
             Vector3 moveVector = new Vector3();
 
+            float currentSpeed = (Input.isPressed(Keys.Shift))?moveSpeed * 2:moveSpeed;
+
             if (Input.isPressed(Keys.W))
-                moveVector += (Vector3.UnitZ * -moveSpeed);
+                moveVector += (Vector3.UnitZ * -currentSpeed);
 
             if (Input.isPressed(Keys.S))
-                moveVector += (Vector3.UnitZ * moveSpeed);
+                moveVector += (Vector3.UnitZ * currentSpeed);
 
             if (Input.isPressed(Keys.A))
-                moveVector += (Vector3.UnitX * -moveSpeed);
+                moveVector += (Vector3.UnitX * -currentSpeed);
 
             if (Input.isPressed(Keys.D))
-                moveVector += (Vector3.UnitX * moveSpeed);
+                moveVector += (Vector3.UnitX * currentSpeed);
 
             if (moveVector != Vector3.Zero)
             {

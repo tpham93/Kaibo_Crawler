@@ -170,8 +170,9 @@ namespace Kaibo_Crawler
                 _graphicsDevice.SetVertexBuffer(0, mesh.VertexBuffer, mesh.VertexSize);
                 _graphicsDevice.SetVertexInputLayout(mesh.InputLayout);
                 _graphicsDevice.SetIndexBuffer(mesh.IndexBuffer, true);
-                if( mesh.DiffuseTexture != null )
+                if (mesh.DiffuseTexture != null)
                     _effect.Parameters["diffuseTexture"].SetResource(mesh.DiffuseTexture);
+                _effect.CurrentTechnique.Passes[0].Apply();
 
                 //_graphicsDevice.DrawIndexed(mesh.PrimitiveTopology, mesh.IndexCount);
                 _graphicsDevice.Draw(mesh.PrimitiveTopology, mesh.VertexCount);

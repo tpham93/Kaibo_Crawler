@@ -19,6 +19,7 @@ namespace Kaibo_Crawler
             Floor,
             Floor_With_Key,
             Door,
+            Goal,
             Count
         }
 
@@ -53,6 +54,7 @@ namespace Kaibo_Crawler
         private Model floorModel;
         private Model ceilingModel;
         private Model floorKeyModel;
+        private Model doorModel;
 
         private string filepath;
         private Size2 tileSize;
@@ -94,40 +96,43 @@ namespace Kaibo_Crawler
             scene = importer.ImportFile(fileName, Assimp.PostProcessSteps.MakeLeftHanded);
             ceilingModel = new Model(scene, device, content);
 
+
+            fileName = System.IO.Path.GetFullPath(content.RootDirectory + "/door.3ds");
+            scene = importer.ImportFile(fileName, Assimp.PostProcessSteps.MakeLeftHanded);
+            doorModel = new Model(scene, device, content);
+
         }
 
         public bool intersects(Vector3 playerPosition, Vector2 size)
         {
             Point playerTilePosition = worldToTileCoordinates(playerPosition);
 
+            Point[] corners = new Point[4];
+            corners[0] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, -size.Y));
+            corners[1] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, size.Y));
+            corners[2] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, -size.Y));
+            corners[3] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, size.Y));
 
+            for (int i = 0; i < corners.Length; ++i)
             {
+                int x = corners[i].X;
+                int y = corners[i].Y;
 
-                Point[] corners = new Point[4];
-                corners[0] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, -size.Y));
-                corners[1] = worldToTileCoordinates(playerPosition + new Vector3(-size.X, 0, size.Y));
-                corners[2] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, -size.Y));
-                corners[3] = worldToTileCoordinates(playerPosition + new Vector3(size.X, 0, size.Y));
-
-                for (int i = 0; i < corners.Length; ++i)
+                if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
                 {
-                    int x = corners[i].X;
-                    int y = corners[i].Y;
-
-                    if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
+                    TileType type = tiles[x, y];
+                    switch (type)
                     {
-                        TileType type = tiles[x, y];
-                        switch (type)
-                        {
-                            case TileType.Wall:
-                            case TileType.Door:
-                                return true;
-                            default:
-                                break;
-                        }
-                    }else{
-                        return true;
+                        case TileType.Wall:
+                        case TileType.Door:
+                            return true;
+                        default:
+                            break;
                     }
+                }
+                else
+                {
+                    return true;
                 }
             }
 
@@ -136,23 +141,26 @@ namespace Kaibo_Crawler
 
         public void trigger(Player player, bool moved)
         {
-            Point currentTile = moved? worldToTileCoordinates(player.Position) : worldToTileCoordinates(player.Position + Vector3.Normalize(player.Direction) * Math.Min(tileSize.Width, tileSize.Height));
+            Point currentTile = moved ? worldToTileCoordinates(player.Position) : worldToTileCoordinates(player.Position + Vector3.Normalize(player.Direction) * Math.Min(tileSize.Width, tileSize.Height));
 
-            TileType type = tiles[currentTile.X, currentTile.Y];
-            switch (type)
+            if (currentTile.X >= 0 && currentTile.Y >= 0 && currentTile.X <= tiles.GetUpperBound(0) && currentTile.Y <= tiles.GetUpperBound(1))
             {
-                case TileType.Floor_With_Key:
-                    player.addKey();
-                    tiles[currentTile.X, currentTile.Y] = TileType.Floor;
-                    break;
-                case TileType.Door:
-                    if (player.hasKey())
-                    {
+                TileType type = tiles[currentTile.X, currentTile.Y];
+                switch (type)
+                {
+                    case TileType.Floor_With_Key:
+                        player.addKey();
                         tiles[currentTile.X, currentTile.Y] = TileType.Floor;
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    case TileType.Door:
+                        if (player.hasKey())
+                        {
+                            tiles[currentTile.X, currentTile.Y] = TileType.Floor;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -165,7 +173,8 @@ namespace Kaibo_Crawler
         {
             Texture t = Texture.Load(device, filepath);
             TileType[,] tiles = new TileType[t.Width, t.Height];
-            List<Vector2> startPositions = new List<Vector2>();
+            List<Point> startPositions = new List<Point>();
+            List<Point> keyPositions = new List<Point>();
             Color[] pixel = t.GetData<Color>();
 
             for (int y = 0; y < t.Height; ++y)
@@ -179,26 +188,28 @@ namespace Kaibo_Crawler
                     }
                     else if (currentPixel == STARTPOINT_COLOR)
                     {
-                        startPositions.Add(new Vector2(x, y));
+                        startPositions.Add(new Point(x, y));
                         tiles[x, y] = TileType.Floor;
                     }
                     else if (currentPixel == FLOOR_WITH_KEY_COLOR)
                     {
-                        tiles[x, y] = TileType.Floor_With_Key;
+                        keyPositions.Add(new Point(x, y));
+                        tiles[x, y] = TileType.Floor;
                     }
                     else if (currentPixel == DOOR_COLOR)
                     {
                         tiles[x, y] = TileType.Door;
                     }
-                    else if (currentPixel == DOOR_COLOR)
+                    else if (currentPixel == GOAL_COLOR)
                     {
-                        tiles[x, y] = TileType.Door;
+                        tiles[x, y] = TileType.Goal;
                     }
                     else
                     {
                         tiles[x, y] = TileType.Wall;
                     }
                 }
+                Console.WriteLine();
             }
 
             if (startPositions.Count == 0)
@@ -207,7 +218,11 @@ namespace Kaibo_Crawler
             }
 
             Random r = new Random();
-            return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
+            int keyIndex = r.Next(keyPositions.Count);
+
+            tiles[keyPositions[keyIndex].X, keyPositions[keyIndex].Y] = TileType.Floor_With_Key;
+
+            return new LoadData(tiles, startPositions[r.Next(startPositions.Count)]);
         }
 
         struct PointLight
@@ -229,7 +244,6 @@ namespace Kaibo_Crawler
         public void Draw(Player player, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
         {
             Matrix transformation = Matrix.Identity;
-
             if (player.IsMoving)
             {
                 player.Height = (float)Math.Pow(Math.Sin(player.MovingTime.TotalSeconds * 5), 2) * 0.8f + 15;
@@ -240,9 +254,9 @@ namespace Kaibo_Crawler
             }
             var transformCB = effect.ConstantBuffers["Transforms"];
             transformCB.Parameters["worldViewProj"].SetValue(player.Cam.viewProjection);
-            transformCB.Parameters["world"].SetValue(player.Cam.view);
+            transformCB.Parameters["world"].SetValue(ref player.Cam.view);
             Matrix worldInvTr = Helpers.CreateInverseTranspose(ref player.Cam.view);
-            transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);
+            transformCB.Parameters["worldInvTranspose"].SetValue(ref worldInvTr);
             transformCB.Parameters["cameraPos"].SetValue(player.Position);
 
             var lightCB = effect.ConstantBuffers["Lights"];
@@ -251,22 +265,41 @@ namespace Kaibo_Crawler
             lightCB.Parameters["dirLightColor"].SetValue(new Vector3(0.0f));
             lightCB.Parameters["numPointLights"].SetValue(1);
 
-
             PointLight[] pointLights = new PointLight[1];
 
-            pointLights[0].Set(10.0f, 60.0f + 7.5f + (player.IsMoving? 2:1) * (float)Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalMilliseconds / 150), 1) * 2 );
+            pointLights[0].Set(10.0f, 60.0f + 7.5f + (player.IsMoving ? 2 : 1) * 2 * (float)Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalMilliseconds / 150), 1) * 2);
             pointLights[0].pos = player.Position;
             //pointLights[0].color = (Vector3.Lerp(Color.White.ToVector3(), Vector3.Lerp(Color.DarkOrange.ToVector3(), Color.Yellow.ToVector3(), (float)(Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalMilliseconds / 600), 2f)) * 0.5f), 0.5f));
             pointLights[0].color = Color.White.ToVector3() * 0.5f;
 
             lightCB.Parameters["lights"].SetValue(pointLights);
 
-            for (int y = -1; y <= tiles.GetUpperBound(1) + 1; ++y)
+            for (int x = -1; x <= tiles.GetUpperBound(0) + 1; ++x)
             {
-                for (int x = -1; x <= tiles.GetUpperBound(0) + 1; ++x)
+                for (int y = -1; y <= tiles.GetUpperBound(1) + 1; ++y)
                 {
-
+                    transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
                     if (x >= 0 && y >= 0 && x <= tiles.GetUpperBound(0) && y <= tiles.GetUpperBound(1))
+                    {
+                        switch (tiles[x, y])
+                        {
+                            case TileType.Wall:
+                                Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
+                    }
+                    transformation *= Matrix.Translation(0, 25, 0);
+                    Helpers.drawModel(ceilingModel, graphicsDevice, effect, transformation, player, gameTime);
+                }
+            }
+            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            {
+                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                {
                     {
                         switch (tiles[x, y])
                         {
@@ -274,31 +307,17 @@ namespace Kaibo_Crawler
                                 transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
                                 Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
                                 break;
-                            case TileType.Door:
-                                transformation = Matrix.RotationY((float)Math.PI / 4);
-                                transformation *= Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
-                                Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
-                                break;
                         }
-                    }
-                    else
-                    {
-                        transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
-                        Helpers.drawModel(wallModel, graphicsDevice, effect, transformation, player, gameTime);
                     }
                 }
             }
-            for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
             {
-                for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
                 {
                     {
                         switch (tiles[x, y])
                         {
-                            case TileType.Floor:
-                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
-                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, player, gameTime);
-                                break;
                             case TileType.Floor_With_Key:
                                 transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
                                 Helpers.drawModel(floorKeyModel, graphicsDevice, effect, transformation, player, gameTime);
@@ -307,16 +326,51 @@ namespace Kaibo_Crawler
                     }
                 }
             }
-            for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
             {
-                for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
                 {
-                    transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, 25 - player.Height, (y + 0.5f) * tileSize.Height);
-                    Helpers.drawModel(ceilingModel, graphicsDevice, effect, transformation, player, gameTime);
+                    {
+                        switch (tiles[x, y])
+                        {
+                            case TileType.Door:
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(doorModel, graphicsDevice, effect, transformation, player, gameTime);
+                                break;
+                        }
+                    }
                 }
             }
-
-
+            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            {
+                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                {
+                    {
+                        switch (tiles[x, y])
+                        {
+                            case TileType.Floor:
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, player, gameTime);
+                                break;
+                        }
+                    }
+                }
+            }
+            for (int x = 0; x <= tiles.GetUpperBound(0); ++x)
+            {
+                for (int y = 0; y <= tiles.GetUpperBound(1); ++y)
+                {
+                    {
+                        switch (tiles[x, y])
+                        {
+                            case TileType.Goal:
+                                transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
+                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, player, gameTime);
+                                break;
+                        }
+                    }
+                }
+            }
         }
     }
 }

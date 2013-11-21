@@ -57,7 +57,7 @@ namespace Kaibo_Crawler
             //transformCB.Parameters["lightPos"].SetValue(player.Position);
 
             // Draw model
-            effect.CurrentTechnique.Passes[0].Apply();
+            //effect.CurrentTechnique.Passes[0].Apply();
             model.Draw(graphicsDevice, effect);
         }
     }

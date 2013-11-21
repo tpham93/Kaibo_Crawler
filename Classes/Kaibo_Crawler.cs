@@ -82,9 +82,9 @@ namespace Kaibo_Crawler
             var importer = new AssimpImporter();
 
             // Load a specific model
-            string fileName = System.IO.Path.GetFullPath(Content.RootDirectory + "/tower.3ds");
-            Scene scene = importer.ImportFile(fileName, PostProcessSteps.MakeLeftHanded);
-            m_model = new Model(scene, GraphicsDevice, Content);
+            //string fileName = System.IO.Path.GetFullPath(Content.RootDirectory + "/tower.3ds");
+            //Scene scene = importer.ImportFile(fileName, PostProcessSteps.MakeLeftHanded);
+            //m_model = new Model(scene, GraphicsDevice, Content);
 
             // Load shader 
             EffectCompilerFlags compilerFlags = EffectCompilerFlags.None;
