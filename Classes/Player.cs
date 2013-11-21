@@ -93,6 +93,11 @@ namespace Kaibo_Crawler
             {
                 isMoving = false;
                 movingTime = new TimeSpan();
+
+                if (Input.leftClicked())
+                {
+                    map.trigger(this, false);
+                }
             }
 
             cam.update(position);
@@ -111,6 +116,8 @@ namespace Kaibo_Crawler
             {
                 position += Vector3.UnitZ * movement.Z;
             }
+
+            map.trigger(this, true);
 
         }
 
