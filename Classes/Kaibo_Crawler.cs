@@ -19,6 +19,7 @@ namespace Kaibo_Crawler
     /// </summary>
     public class Kaibo_Crawler : Game
     {
+
         private GraphicsDeviceManager m_graphicsDeviceManager;
         private Model m_model;
         private SharpDX.Toolkit.Graphics.Effect m_simpleEffect;
@@ -31,6 +32,10 @@ namespace Kaibo_Crawler
         Player player;
 
         Map map;
+
+        SpriteBatch spritebatch;
+
+        Texture2D gameOver;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
@@ -47,8 +52,8 @@ namespace Kaibo_Crawler
             Content.RootDirectory = "content";
             //m_graphicsDeviceManager.IsFullScreen = true;
 
-            //m_graphicsDeviceManager.PreferredBackBufferWidth = GraphicsAdapter.Default.GetOutputAt(0).CurrentDisplayMode.Width;
-            //m_graphicsDeviceManager.PreferredBackBufferHeight = GraphicsAdapter.Default.GetOutputAt(0).CurrentDisplayMode.Height;
+            m_graphicsDeviceManager.PreferredBackBufferWidth = 800;
+            m_graphicsDeviceManager.PreferredBackBufferHeight = 600;
 
         }
 
@@ -106,6 +111,11 @@ namespace Kaibo_Crawler
             map.LoadContent(GraphicsDevice, Content);
             player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
             player.Map = map;
+
+            spritebatch = new SpriteBatch(m_graphicsDeviceManager.GraphicsDevice, 2048);
+
+            gameOver = Content.Load<Texture2D>("gameover.png");
+
         }
 
         protected override void Update(GameTime gameTime)
@@ -119,6 +129,7 @@ namespace Kaibo_Crawler
                 if (Input.isClicked(Keys.Escape))
                     Exit();
             }
+
             base.Update(gameTime);
         }
 
@@ -139,6 +150,12 @@ namespace Kaibo_Crawler
             // Draws the model
             //Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
             map.Draw(player, GraphicsDevice, m_simpleEffect, gameTime);
+
+            spritebatch.Begin();
+            spritebatch.Draw(gameOver, Vector2.Zero, Color.White);
+            spritebatch.End();
+
+
             base.Draw(gameTime);
         }
     }
