@@ -151,10 +151,12 @@ namespace Kaibo_Crawler
             //Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
             map.Draw(player, GraphicsDevice, m_simpleEffect, gameTime);
 
-            spritebatch.Begin();
-            spritebatch.Draw(gameOver, Vector2.Zero, Color.White);
-            spritebatch.End();
-
+            if (player.Won)
+            {
+                spritebatch.Begin();
+                spritebatch.Draw(gameOver, Vector2.Zero, Color.White);
+                spritebatch.End();
+            }
 
             base.Draw(gameTime);
         }

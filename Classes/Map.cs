@@ -158,6 +158,12 @@ namespace Kaibo_Crawler
                             tiles[currentTile.X, currentTile.Y] = TileType.Floor;
                         }
                         break;
+                    case TileType.Goal:
+                        if (moved)
+                        {
+                            player.Won = true;
+                        }
+                        break;
                     default:
                         break;
                 }

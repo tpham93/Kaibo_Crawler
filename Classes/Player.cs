@@ -26,6 +26,12 @@ namespace Kaibo_Crawler
         private float height;
         private bool won;
 
+        public bool Won
+        {
+            get { return won; }
+            set { won = value; }
+        }
+
         public Camera Cam
         {
             get { return cam; }
