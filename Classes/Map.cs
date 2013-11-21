@@ -200,6 +200,22 @@ namespace Kaibo_Crawler
             return new LoadData(tiles, startPositions[r.Next() % startPositions.Count]);
         }
 
+        struct PointLight
+        {
+            public Vector3 pos;
+            float att1;				// -1 / (outer_range-inner_range)
+            public Vector3 color;
+            float att2;				// 1 + inner_range / (outer_range-inner_range)
+            // The inner_range is the distance at which the light starts to fade out.
+            // The outer_range is the distance where the light gets 0.
+
+            public void Set(float innerRange, float outerRange)
+            {
+                att1 = -1 / (outerRange - innerRange);
+                att2 = 1 - innerRange * att1;
+            }
+        }
+
         public void Draw(Player player, GraphicsDevice graphicsDevice, SharpDX.Toolkit.Graphics.Effect effect, GameTime gameTime)
         {
             Matrix transformation = Matrix.Identity;
@@ -212,6 +228,29 @@ namespace Kaibo_Crawler
             {
                 height = Math.Max(height - 3f * (float)gameTime.ElapsedGameTime.TotalSeconds,13);
             }
+            var transformCB = effect.ConstantBuffers["Transforms"];
+            transformCB.Parameters["worldViewProj"].SetValue(player.Cam.viewProjection);
+            transformCB.Parameters["world"].SetValue(player.Cam.view);
+            Matrix worldInvTr = Helpers.CreateInverseTranspose(ref player.Cam.view);
+            transformCB.Parameters["worldInvTranspose"].SetValue(worldInvTr);
+            transformCB.Parameters["cameraPos"].SetValue(player.Position);
+
+            var lightCB = effect.ConstantBuffers["Lights"];
+            lightCB.Parameters["lightDir"].SetValue(new Vector3(0));
+            lightCB.Parameters["specularPower"].SetValue(0);
+            lightCB.Parameters["dirLightColor"].SetValue(new Vector3(0.0f));
+            lightCB.Parameters["numPointLights"].SetValue(1);
+
+
+            PointLight[] pointLights = new PointLight[1];
+
+            pointLights[0].Set(10.0f, 60.0f + 7.5f * (float)Math.Sin(gameTime.TotalGameTime.TotalMilliseconds / 150));  
+            pointLights[0].pos = player.Position;
+            pointLights[0].color = new Vector3(1.0f, 0.8f, 0.5f);
+
+
+            lightCB.Parameters["lights"].SetValue(pointLights);
+
             for (int y = -1; y <= tiles.GetUpperBound(1) + 1; ++y)
             {
                 for (int x = -1; x <= tiles.GetUpperBound(0) + 1; ++x)

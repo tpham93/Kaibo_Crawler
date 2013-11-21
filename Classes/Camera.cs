@@ -12,6 +12,7 @@ namespace Kaibo_Crawler
     class Camera
     {
         public Matrix projection;
+
         public Matrix view;
         public Matrix viewProjection;
 

@@ -50,6 +50,7 @@ float3 lightning( float3 _vN, float3 _vL, float3 _vV, float3 lightColor, float3 
 {
 	// Gamma-corrected two-sided N dot L light
 	float fNdotL = dot( _vN, _vL );
+
 	float fDiffuse = abs( fNdotL * 0.7 + 0.3);
 	fDiffuse = pow(fDiffuse, 1.5);
 
@@ -88,7 +89,8 @@ float4 PS( PS_IN input ) : SV_TARGET
 		float3 vLightDir = lights[i].pos - input.worldPos;
 		float distance = length(vLightDir);
 		float attentuation = smootherstep( saturate(lights[i].att1 * distance + lights[i].att2) );
-		if( attentuation > 0.0 )
+
+		if( attentuation > 0.0f)
 		{
 			vLightDir /= distance;
 			color += lightning( N, vLightDir, V, lights[i].color, diffuseTex ) * attentuation;

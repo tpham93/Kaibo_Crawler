@@ -92,7 +92,7 @@ namespace Kaibo_Crawler
 #if DEBUG
             compilerFlags |= EffectCompilerFlags.Debug;
 #endif
-            var simpleShaderCompileResult = compiler.CompileFromFile(Content.RootDirectory + "/simple.fx", compilerFlags);
+            var simpleShaderCompileResult = compiler.CompileFromFile(Content.RootDirectory + "/pointlight.fx", compilerFlags);
             if (simpleShaderCompileResult.HasErrors)
             {
                 System.Console.WriteLine(simpleShaderCompileResult.Logger.Messages);
