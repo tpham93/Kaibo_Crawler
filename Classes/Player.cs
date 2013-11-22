@@ -25,6 +25,14 @@ namespace Kaibo_Crawler
         private TimeSpan movingTime;
         private float height;
         private bool won;
+        private bool isMapOpen;
+
+        public bool IsMapOpen
+        {
+            get { return isMapOpen; }
+            set { isMapOpen = value; }
+        }
+
 
         public bool Won
         {
@@ -105,6 +113,9 @@ namespace Kaibo_Crawler
             {
                 isMoving = false;
                 movingTime = new TimeSpan();
+
+                if (Input.isClicked(Keys.Tab))
+                    isMapOpen = !isMapOpen;
 
                 if (Input.leftClicked())
                 {
