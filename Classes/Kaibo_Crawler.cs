@@ -39,7 +39,6 @@ namespace Kaibo_Crawler
 
         Texture2D compass;
         Texture2D compassNeedle;
-        Texture2D mapTex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
@@ -129,8 +128,6 @@ namespace Kaibo_Crawler
             map = new Map(@"Content\map.PNG", new Size2(20, 20));
             map.LoadContent(GraphicsDevice, Content);
 
-            mapTex = Content.Load<Texture2D>("map.PNG");
-
             player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
             player.Map = map;
 
@@ -185,7 +182,7 @@ namespace Kaibo_Crawler
                 if (player.IsMapOpen)
                 {
                   //  spritebatch.Draw(compass, Vector2.Zero, Color.White);
-                    spritebatch.Draw(mapTex, new Rectangle(0, 0, 800, 600), new Rectangle(0, 0, mapTex.Width, mapTex.Height), Color.White, 0, Vector2.Zero, SpriteEffects.None, 0);
+                    spritebatch.Draw(map.Minimap, new Rectangle(0, 0, 800, 600), new Rectangle(0, 0, map.Minimap.Width, map.Minimap.Height), Color.White, 0, Vector2.Zero, SpriteEffects.None, 0);
 
                    
 

@@ -27,6 +27,7 @@ namespace Kaibo_Crawler
         {
             TileType[,] tiles;
             Vector2 startPosition;
+            Texture2D minimap;
 
             public TileType[,] Tiles
             {
@@ -36,11 +37,16 @@ namespace Kaibo_Crawler
             {
                 get { return startPosition; }
             }
+            public Texture2D Minimap
+            {
+                get { return minimap; }
+            }
 
-            public LoadData(TileType[,] tiles, Vector2 startPosition)
+            public LoadData(TileType[,] tiles, Vector2 startPosition, Texture2D minimap)
             {
                 this.tiles = tiles;
                 this.startPosition = startPosition;
+                this.minimap = minimap;
             }
         }
 
@@ -61,9 +67,15 @@ namespace Kaibo_Crawler
         private TileType[,] tiles;
         private Vector2 startPosition;
 
+        private Texture2D minimap;
+
         public Vector3 StartPosition
         {
             get { return new Vector3((startPosition.X + 0.5f) * tileSize.Width, 0, (startPosition.Y + 0.5f) * tileSize.Height); }
+        }
+        public Texture2D Minimap
+        {
+            get { return minimap; }
         }
 
         public Map(string filepath, Size2 tileSize)
@@ -77,6 +89,7 @@ namespace Kaibo_Crawler
             LoadData loadData = LoadMapData(device, filepath);
             tiles = loadData.Tiles;
             startPosition = loadData.StartPosition;
+            minimap = loadData.Minimap;
             var importer = new Assimp.AssimpImporter();
 
 
@@ -177,49 +190,55 @@ namespace Kaibo_Crawler
 
         private static LoadData LoadMapData(GraphicsDevice device, string filepath)
         {
-            Texture t = Texture.Load(device, filepath);
-            TileType[,] tiles = new TileType[t.Width, t.Height];
+            Texture2D minimap = Texture2D.Load(device, filepath,TextureFlags.ShaderResource,SharpDX.Direct3D11.ResourceUsage.Dynamic);
+            TileType[,] tiles = new TileType[minimap.Width, minimap.Height];
             List<Point> startPositions = new List<Point>();
             List<Point> keyPositions = new List<Point>();
-            Color[] pixel = t.GetData<Color>();
+            Color[] pixel = minimap.GetData<Color>();
 
-            for (int y = 0; y < t.Height; ++y)
+            for (int y = 0; y < minimap.Height; ++y)
             {
-                for (int x = 0; x < t.Width; ++x)
+                for (int x = 0; x < minimap.Width; ++x)
                 {
-                    Color currentPixel = pixel[x + y * t.Width];
+                    Color currentPixel = pixel[x + y * minimap.Width];
                     currentPixel = new Color(currentPixel.B,currentPixel.G,currentPixel.R);
 
                     if (currentPixel == FLOOR_COLOR)
                     {
                         tiles[x, y] = TileType.Floor;
+                        pixel[x + y * minimap.Width] = Color.White;
                         Console.Out.Write("F");
                     }
                     else if (currentPixel == STARTPOINT_COLOR)
                     {
                         startPositions.Add(new Point(x, y));
                         tiles[x, y] = TileType.Floor;
+                        pixel[x + y * minimap.Width] = Color.White;
                         Console.Out.Write("S");
                     }
                     else if (currentPixel == FLOOR_WITH_KEY_COLOR)
                     {
                         keyPositions.Add(new Point(x, y));
                         tiles[x, y] = TileType.Floor;
+                        pixel[x + y * minimap.Width] = Color.White;
                         Console.Out.Write("K");
                     }
                     else if (currentPixel == DOOR_COLOR)
                     {
                         tiles[x, y] = TileType.Door;
+                        pixel[x + y * minimap.Width] = Color.White;
                         Console.Out.Write("D");
                     }
                     else if (currentPixel == GOAL_COLOR)
                     {
                         tiles[x, y] = TileType.Goal;
+                        pixel[x + y * minimap.Width] = Color.White;
                         Console.Out.Write("G");
                     }
                     else
                     {
                         tiles[x, y] = TileType.Wall;
+                        pixel[x + y * minimap.Width] = Color.Black;
                         Console.Out.Write("_");
                     }
                 }
@@ -235,8 +254,8 @@ namespace Kaibo_Crawler
             int keyIndex = r.Next(keyPositions.Count);
 
             tiles[keyPositions[keyIndex].X, keyPositions[keyIndex].Y] = TileType.Floor_With_Key;
-
-            return new LoadData(tiles, startPositions[r.Next(startPositions.Count)]);
+            minimap.SetData<Color>(pixel);
+            return new LoadData(tiles, startPositions[r.Next(startPositions.Count)], minimap);
         }
 
         struct PointLight
