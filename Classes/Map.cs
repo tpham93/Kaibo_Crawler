@@ -359,6 +359,7 @@ namespace Kaibo_Crawler
                             case TileType.Floor_With_Key:
                                 transformation = Matrix.Translation((x + 0.5f) * tileSize.Width, -player.Height, (y + 0.5f) * tileSize.Height);
                                 Helpers.drawModel(floorKeyModel, graphicsDevice, effect, transformation, player, gameTime);
+                                Helpers.drawModel(floorModel, graphicsDevice, effect, transformation, player, gameTime);
                                 break;
                         }
                     }
