@@ -43,7 +43,7 @@ namespace Kaibo_Crawler
         public Camera(Vector3 position, GraphicsDevice graphics)
         {
 
-            this.rotationSpeed = 0.5f;
+            this.rotationSpeed = 0.75f;
 
             view = Matrix.LookAtRH(
                 position,                                                       // Position

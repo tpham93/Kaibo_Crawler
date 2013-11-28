@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Text;
 using SharpDX;
-
+using SharpDX.Toolkit;
+using SharpDX.Toolkit.Graphics;
+using Assimp;
+using System;
+using SharpDX.DirectInput;
+using SharpDX.Toolkit.Input;
 
 namespace Kaibo_Crawler
 {
     // Use these namespaces here to override SharpDX.Direct3D11
-    using SharpDX.Toolkit;
-    using SharpDX.Toolkit.Graphics;
-    using Assimp;
-    using System;
-    using SharpDX.DirectInput;
-    using SharpDX.Toolkit.Input;
 
 
     /// <summary>
@@ -40,6 +39,8 @@ namespace Kaibo_Crawler
         Texture2D compass;
         Texture2D compassNeedle;
 
+        int width = 800;
+        int height = 600;
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
         /// </summary>
@@ -55,14 +56,16 @@ namespace Kaibo_Crawler
             Content.RootDirectory = "content";
             //m_graphicsDeviceManager.IsFullScreen = true;
 
-            m_graphicsDeviceManager.PreferredBackBufferWidth = 800;
-            m_graphicsDeviceManager.PreferredBackBufferHeight = 600;
+            m_graphicsDeviceManager.PreferredBackBufferWidth = width;
+            m_graphicsDeviceManager.PreferredBackBufferHeight = height;
 
         }
 
         protected override void Initialize()
         {
             base.Initialize();
+
+            
 
             Window.Title = "Kaibo Crawler";
 
@@ -86,16 +89,22 @@ namespace Kaibo_Crawler
             var blendStateDesc1 = SharpDX.Direct3D11.BlendStateDescription.Default();
             blendStateDesc1.IndependentBlendEnable = false;
             blendStateDesc1.AlphaToCoverageEnable = false;
-            /*
-            m_alphaBlendState = BlendState.New(GraphicsDevice,  SharpDX.Direct3D11.BlendOption.SourceColor,         //sourceBlend
-                                                                SharpDX.Direct3D11.BlendOption.SourceColor,         //destinationBlend
+
+
+
+            m_alphaBlendState = BlendState.New(GraphicsDevice,  SharpDX.Direct3D11.BlendOption.One,         //sourceBlend
+                                                                SharpDX.Direct3D11.BlendOption.Zero,         //destinationBlend
                                                                 SharpDX.Direct3D11.BlendOperation.Add,              //blendoperation
-                                                                SharpDX.Direct3D11.BlendOption.DestinationColor,    //source alphaBlend
-                                                                SharpDX.Direct3D11.BlendOption.SourceColor,         //destination alpha blend
+                                                                SharpDX.Direct3D11.BlendOption.Zero,    //source alphaBlend
+                                                                SharpDX.Direct3D11.BlendOption.One,         //destination alpha blend
                                                                 SharpDX.Direct3D11.BlendOperation.Add,              //alphablend operation
-                                                                SharpDX.Direct3D11.ColorWriteMaskFlags.Alpha,       //rendertarget mask
+                                                                SharpDX.Direct3D11.ColorWriteMaskFlags.All,       //rendertarget mask
                                                                 -1);                                                //mask
-            */
+            
+
+           
+
+                
             Input.init(this);
         }
 
@@ -131,10 +140,12 @@ namespace Kaibo_Crawler
             player = new Player(new Vector3(0.0f, 10.0f, 0.0f), GraphicsDevice);
             player.Map = map;
 
-            spritebatch = new SpriteBatch(m_graphicsDeviceManager.GraphicsDevice, 2048);
-
+            spritebatch = new SpriteBatch(GraphicsDevice, 2048);
+   
+          
 
             compass = Content.Load<Texture2D>("compass.png");
+            
             compassNeedle = Content.Load<Texture2D>("needle.png");
 
             gameOver = Content.Load<Texture2D>("gameover.png");
@@ -174,18 +185,17 @@ namespace Kaibo_Crawler
             //Helpers.drawModel(m_model, GraphicsDevice, m_simpleEffect, transformation, player.Cam.ViewProjection, gameTime);
             map.Draw(player, GraphicsDevice, m_simpleEffect, gameTime);
 
-            spritebatch.Begin(SpriteSortMode.Deferred, m_blendStateOpaque, m_linearSamplerState, m_depthStencilStateState, m_backfaceCullingState, null, Matrix.Identity);
+            GraphicsDevice.SetBlendState(m_alphaBlendState);
+            spritebatch.Begin(SpriteSortMode.Deferred, m_alphaBlendState, m_linearSamplerState, m_depthStencilStateState, m_backfaceCullingState, null, Matrix.Identity);
 
                 if (player.Won)
                     spritebatch.Draw(gameOver, Vector2.Zero, Color.White);
 
                 if (player.IsMapOpen)
                 {
-                  //  spritebatch.Draw(compass, Vector2.Zero, Color.White);
+                    spritebatch.Draw(compassNeedle, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, player.Cam.Yaw, new Vector2(64,64), 1.0f, SpriteEffects.None, 0);
+                 //   spritebatch.Draw(compass, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, 0, new Vector2(64, 64), 1.0f, SpriteEffects.None, 0);
                     spritebatch.Draw(map.Minimap, new Rectangle(0, 0, 800, 600), new Rectangle(0, 0, map.Minimap.Width, map.Minimap.Height), Color.White, 0, Vector2.Zero, SpriteEffects.None, 0);
-
-                   
-
                 }
 
             spritebatch.End();
