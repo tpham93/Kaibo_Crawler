@@ -24,6 +24,7 @@ namespace Kaibo_Crawler
 
         RasterizerState m_backfaceCullingState;
         DepthStencilState m_depthStencilStateState;
+        DepthStencilState m_noDepthStencil;
         SamplerState m_linearSamplerState;
         BlendState m_blendStateOpaque;
         BlendState m_alphaBlendState;
@@ -76,6 +77,13 @@ namespace Kaibo_Crawler
             var depthStencilStateDesc = SharpDX.Direct3D11.DepthStencilStateDescription.Default();
             m_depthStencilStateState = DepthStencilState.New(GraphicsDevice, "NormalZBufferUse", depthStencilStateDesc);
 
+            depthStencilStateDesc = SharpDX.Direct3D11.DepthStencilStateDescription.Default();
+            depthStencilStateDesc.IsDepthEnabled = false;
+           
+
+            m_noDepthStencil = DepthStencilState.New(GraphicsDevice, "NoZBufferUse", depthStencilStateDesc);
+
+
             var samplerStateDesc = SharpDX.Direct3D11.SamplerStateDescription.Default();
             samplerStateDesc.AddressV = SharpDX.Direct3D11.TextureAddressMode.Wrap;
             samplerStateDesc.AddressU = SharpDX.Direct3D11.TextureAddressMode.Wrap;
@@ -86,17 +94,17 @@ namespace Kaibo_Crawler
             var blendStateDesc = SharpDX.Direct3D11.BlendStateDescription.Default();
             m_blendStateOpaque = BlendState.New(GraphicsDevice, "Opaque", blendStateDesc);
 
+
             var blendStateDesc1 = SharpDX.Direct3D11.BlendStateDescription.Default();
             blendStateDesc1.IndependentBlendEnable = false;
             blendStateDesc1.AlphaToCoverageEnable = false;
 
 
-
-            m_alphaBlendState = BlendState.New(GraphicsDevice,  SharpDX.Direct3D11.BlendOption.One,         //sourceBlend
-                                                                SharpDX.Direct3D11.BlendOption.Zero,         //destinationBlend
+            m_alphaBlendState = BlendState.New(GraphicsDevice,  SharpDX.Direct3D11.BlendOption.SourceAlpha,         //sourceBlend
+                                                                SharpDX.Direct3D11.BlendOption.InverseSourceAlpha,         //destinationBlend
                                                                 SharpDX.Direct3D11.BlendOperation.Add,              //blendoperation
-                                                                SharpDX.Direct3D11.BlendOption.Zero,    //source alphaBlend
-                                                                SharpDX.Direct3D11.BlendOption.One,         //destination alpha blend
+                                                                SharpDX.Direct3D11.BlendOption.SourceAlpha,    //source alphaBlend
+                                                                SharpDX.Direct3D11.BlendOption.InverseSourceAlpha,         //destination alpha blend
                                                                 SharpDX.Direct3D11.BlendOperation.Add,              //alphablend operation
                                                                 SharpDX.Direct3D11.ColorWriteMaskFlags.All,       //rendertarget mask
                                                                 -1);                                                //mask
@@ -186,16 +194,18 @@ namespace Kaibo_Crawler
             map.Draw(player, GraphicsDevice, m_simpleEffect, gameTime);
 
             GraphicsDevice.SetBlendState(m_alphaBlendState);
-            spritebatch.Begin(SpriteSortMode.Deferred, m_alphaBlendState, m_linearSamplerState, m_depthStencilStateState, m_backfaceCullingState, null, Matrix.Identity);
+            spritebatch.Begin(SpriteSortMode.Deferred, m_alphaBlendState, m_linearSamplerState, m_noDepthStencil, m_backfaceCullingState, null, Matrix.Identity);
 
                 if (player.Won)
                     spritebatch.Draw(gameOver, Vector2.Zero, Color.White);
 
                 if (player.IsMapOpen)
                 {
-                    spritebatch.Draw(compassNeedle, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, player.Cam.Yaw, new Vector2(64,64), 1.0f, SpriteEffects.None, 0);
-                 //   spritebatch.Draw(compass, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, 0, new Vector2(64, 64), 1.0f, SpriteEffects.None, 0);
                     spritebatch.Draw(map.Minimap, new Rectangle(0, 0, 800, 600), new Rectangle(0, 0, map.Minimap.Width, map.Minimap.Height), Color.White, 0, Vector2.Zero, SpriteEffects.None, 0);
+                    spritebatch.Draw(compass, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, 0, new Vector2(64, 64), 1.0f, SpriteEffects.None, 0);
+                    spritebatch.Draw(compassNeedle, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, player.Cam.Yaw, new Vector2(64,64), 1.0f, SpriteEffects.None, 0);
+
+                  
                 }
 
             spritebatch.End();
