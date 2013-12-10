@@ -39,9 +39,15 @@ namespace Kaibo_Crawler
 
         Texture2D compass;
         Texture2D compassNeedle;
+        Texture2D torch;
+        public static Texture2D particle;
+        public static Random random = new System.Random();
 
         int width = 800;
         int height = 600;
+
+
+        ParticleEmitter emitter = new ParticleEmitter(Vector2.Zero, EParticleType.torchParticle, 0);
         /// <summary>
         /// Initializes a new instance of the <see cref="Kaibo_Crawler" /> class.
         /// </summary>
@@ -108,10 +114,10 @@ namespace Kaibo_Crawler
                                                                 SharpDX.Direct3D11.BlendOperation.Add,              //alphablend operation
                                                                 SharpDX.Direct3D11.ColorWriteMaskFlags.All,       //rendertarget mask
                                                                 -1);                                                //mask
-            
 
-           
 
+
+      
                 
             Input.init(this);
         }
@@ -153,10 +159,13 @@ namespace Kaibo_Crawler
           
 
             compass = Content.Load<Texture2D>("compass.png");
-            
+            torch = Content.Load<Texture2D>("torchPlaceholder.png");
             compassNeedle = Content.Load<Texture2D>("needle.png");
+            particle = Content.Load<Texture2D>("particle.png");
 
             gameOver = Content.Load<Texture2D>("gameover.png");
+
+            emitter.position = new Vector2(width - torch.Width / 2, height - torch.Height / 3);
 
         }
 
@@ -167,6 +176,7 @@ namespace Kaibo_Crawler
                 Input.update();
 
                 player.update(gameTime);
+                emitter.update(gameTime);
 
                 if (Input.isClicked(Keys.Escape))
                     Exit();
@@ -196,6 +206,10 @@ namespace Kaibo_Crawler
             GraphicsDevice.SetBlendState(m_alphaBlendState);
             spritebatch.Begin(SpriteSortMode.Deferred, m_alphaBlendState, m_linearSamplerState, m_noDepthStencil, m_backfaceCullingState, null, Matrix.Identity);
 
+            spritebatch.Draw(torch, new Vector2(width - torch.Width, height - torch.Height), Color.White);
+
+            emitter.draw(spritebatch);
+
                 if (player.Won)
                     spritebatch.Draw(gameOver, Vector2.Zero, Color.White);
 
@@ -204,7 +218,7 @@ namespace Kaibo_Crawler
                     spritebatch.Draw(map.Minimap, new Rectangle(0, 0, 800, 600), new Rectangle(0, 0, map.Minimap.Width, map.Minimap.Height), Color.White, 0, Vector2.Zero, SpriteEffects.None, 0);
                     spritebatch.Draw(compass, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, 0, new Vector2(64, 64), 1.0f, SpriteEffects.None, 0);
                     spritebatch.Draw(compassNeedle, new Vector2(width - compassNeedle.Width / 2, compassNeedle.Height / 2), new Rectangle(0, 0, 128, 128), Color.White, player.Cam.Yaw, new Vector2(64,64), 1.0f, SpriteEffects.None, 0);
-
+                 
                   
                 }
 
