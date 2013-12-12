@@ -42,7 +42,7 @@ namespace Kaibo_Crawler
             this.speed = speed;
             this.lifeTime = lifeTime;
 
-            this.scale = (float)(0.5 * Kaibo_Crawler.random.NextDouble());
+            this.scale = (float)(0.5*Kaibo_Crawler.random.NextDouble());
             this.rotation = (float)(Math.PI* Kaibo_Crawler.random.NextDouble());
 
             if (Kaibo_Crawler.random.NextDouble() < 0.5)

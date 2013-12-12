@@ -165,7 +165,7 @@ namespace Kaibo_Crawler
 
             gameOver = Content.Load<Texture2D>("gameover.png");
 
-            emitter.position = new Vector2(width - torch.Width / 2, height - torch.Height / 3);
+            emitter.position = new Vector2(width - torch.Width / 3, height - torch.Height / 3);
 
         }
 

@@ -33,8 +33,8 @@ namespace Kaibo_Crawler
         {
             //TODO: currently its tick based, make it timebased:
             emit(type, gameTime);
-            emit(type, gameTime);
-            emit(type, gameTime);
+       //     emit(type, gameTime);
+         //   emit(type, gameTime);
 
 
             for (int i = 0; i < particles.Count; i++)
